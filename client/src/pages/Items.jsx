@@ -3,7 +3,7 @@ import ItemList from '../components/ItemList'
 
 const Items = () => {
   return (
-    <div className='min-w-screen flex justify-center'>
+    <div className='min-w-screen '>
       <ItemList />
     </div>
   )

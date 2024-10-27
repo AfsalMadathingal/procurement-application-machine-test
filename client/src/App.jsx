@@ -9,7 +9,7 @@ import Dashboard from './components/CardComponent';
 const App = () => {
     return (
         <Router>
-            <div className="container flex ">
+            <div className="container flex grid grid-cols-[auto,1fr] min-h-screen">
             <Dashboard />
                 <Routes>
                     <Route path="/suppliers" element={<Suppliers />} />

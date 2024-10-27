@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faPlus, 
@@ -9,6 +9,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import SupplierModal from './SupplierForm';
 
 const SupplierList = ({ suppliers = [
   {
@@ -23,21 +24,30 @@ const SupplierList = ({ suppliers = [
   }
 ] }) => { 
 
+   const [showModal, setShowModal] = useState(false);
+
+
+  
+
     SupplierList.propTypes = {
         suppliers: PropTypes.array
     }
 
 
+
   const navigate = useNavigate();
 
   return (
+    <>
+    <SupplierModal isOpen={showModal} onClose={()=>setShowModal(false)} />
+
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Supplier Management</h1>
           <button 
-            onClick={() => navigate('/suppliers/add')}
+            onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FontAwesomeIcon icon={faPlus} />
@@ -117,6 +127,7 @@ const SupplierList = ({ suppliers = [
         </table>
       </div>
     </div>
+    </>
   );
 };
 

@@ -10,18 +10,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-
+// SidebarItem Component
 const SidebarItem = ({ icon, title, onClick, isCollapsed }) => {
-
-    SidebarItem.propTypes = {
-        icon: PropTypes.object.isRequired,
-        title: PropTypes.string.isRequired,
-        onClick: PropTypes.func.isRequired,
-        isCollapsed: PropTypes.bool.isRequired,
-      };
-    
-    
-
   return (
     <div 
       onClick={onClick}
@@ -35,8 +25,15 @@ const SidebarItem = ({ icon, title, onClick, isCollapsed }) => {
   );
 };
 
-const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+SidebarItem.propTypes = {
+  icon: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  isCollapsed: PropTypes.bool.isRequired,
+};
+
+// Sidebar Component
+const Sidebar = ({ isCollapsed, toggleCollapse }) => {
   const navigate = useNavigate();
 
   const handleNavigation = (path) => {
@@ -44,12 +41,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`fixed flex flex-col top-0  bg-gray-800 h-full text-white transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`} style={{zIndex: 10}}>
+    <div className={`flex flex-col bg-gray-800 h-full text-white transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`} style={{zIndex: 10}}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         {!isCollapsed && <h1 className="text-xl font-bold">Inventory App</h1>}
         <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={toggleCollapse}
           className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
         >
           <FontAwesomeIcon 
@@ -84,4 +81,34 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+Sidebar.propTypes = {
+  isCollapsed: PropTypes.bool.isRequired,
+  toggleCollapse: PropTypes.func.isRequired,
+};
+
+// Layout Component
+const Layout = ({ children }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  return (
+    <div className="flex h-screen w-screen">
+      {/* Sidebar */}
+      <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
+
+      {/* Main Content Area */}
+      <div className={`flex-1 p-6 transition-all duration-300 overflow-scroll ${isCollapsed ? 'ml-2' : 'ml-4'}`}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default Layout;

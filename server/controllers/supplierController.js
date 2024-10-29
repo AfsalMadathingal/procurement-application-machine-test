@@ -1,6 +1,7 @@
 const HTTP_STATUS = require('../constants/httpStatus');
 const Supplier = require('../models/Supplier');
 const apiResponse = require('../utils/apiResponse');
+const { validateSupplier } = require('../utils/validator');
 
 
 exports.getSuppliers = async (req, res, next) => {
@@ -8,7 +9,7 @@ exports.getSuppliers = async (req, res, next) => {
         const suppliers = await Supplier.find();
 
         res.status(HTTP_STATUS.OK).json(
-            new apiResponse(HTTP_STATUS.OK, null, 'Success', suppliers)
+            new apiResponse(HTTP_STATUS.OK, suppliers, 'Success' )
         );
     } catch (error) {
         next(error);
@@ -20,6 +21,15 @@ exports.getSuppliers = async (req, res, next) => {
 exports.addSupplier = async (req, res, next) => {
     try {
 
+        const error = validateSupplier(req.body);
+
+        if(error) {
+
+            return res.status(HTTP_STATUS.BAD_REQUEST).json(
+                new apiResponse(HTTP_STATUS.BAD_REQUEST, error, "Validation error")
+            );
+        }
+
         const supplierNo = await Supplier.countDocuments();
 
         req.body.supplierNo = `SUP${supplierNo + 1}`;
@@ -29,7 +39,7 @@ exports.addSupplier = async (req, res, next) => {
 
 
         res.status(HTTP_STATUS.CREATED).json(
-            new apiResponse(HTTP_STATUS.CREATED, null, 'Success', newSupplier)
+            new apiResponse(HTTP_STATUS.CREATED, newSupplier, 'Success')
         );
 
 

@@ -11,25 +11,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ItemModal from './ItemForm';
+import toast from 'react-hot-toast';
+import { createItem } from '../services/itemService';
 
-const ItemList = ({ items = [
-  {
-    itemNo: "ITM1",
-    itemName: "Wireless Mouse",
-    inventoryLocation: "Warehouse A",
-    brand: "Logitech",
-    category: "Electronics",
-    supplier: "Supplier001",
-    stockUnit: "Pcs",
-    unitPrice: 1200,
-    itemImages: [
-      "https://example.com/images/mouse1.jpg",
-      "https://example.com/images/mouse2.jpg"
-    ],
-    status: "Enabled"
-  }
-] }) => {
+const ItemList = ({items}) => {
    const [showModal, setShowModal] = useState(false);
+
 
   ItemList.propTypes = {
     items: PropTypes.array
@@ -43,17 +30,38 @@ const ItemList = ({ items = [
     }).format(price);
   };
 
+  const saveItem = (data) => {
+
+    try {
+
+      const response = createItem(data);
+
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data);
+        toast.success("Item created successfully");
+        return;
+      } 
+
+      toast.error(response.data.message);
+      
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message);
+    }
+    
+  }
+
   return (
 
     <>
-    <ItemModal  isOpen={ showModal } onClose={() => setShowModal(false)} onSubmit={() => {}} suppliers={[]} />
-    <div className="p-6 bg-gray-50 min-h-screen ">
+    <ItemModal  isOpen={ showModal } onClose={() => setShowModal(false)} onSubmit={saveItem} suppliers={[]} />
+    <div className="p-6 bg-gray-50 ">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Item Management</h1>
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={()=> navigate('/items/create')}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FontAwesomeIcon icon={faPlus} />

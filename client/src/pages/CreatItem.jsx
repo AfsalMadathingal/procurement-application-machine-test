@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react';
+import { Plus, X, Upload } from 'lucide-react';
 import { getSuppliers } from '../services/supplierService';
+import { useNavigate } from 'react-router-dom';
+import { createItem } from '../services/itemService';
 
-const ItemModal = ({ isOpen, onClose, onSubmit }) => {
+const CreateItem = () => {
   const [suppliersList, setSuppliersList] = useState([]);
   const fileInputRef = useRef(null);
-  const dropZoneRef = useRef(null);
   const [formData, setFormData] = useState({
     itemName: '',
     inventoryLocation: '',
@@ -17,9 +18,9 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
   
   const [images, setImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-
   const [stockUnitAndPrice, setStockUnitAndPrice] = useState([{ stockUnit: '', unitPrice: '' }]);
   const stockUnits = ["Kg", "Ltr", "Pcs", "Box"];
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +52,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
   const removeImage = (idToRemove) => {
     setImages(prev => {
       const filtered = prev.filter(image => image.id !== idToRemove);
-      // Revoke the URL to prevent memory leaks
       const removedImage = prev.find(image => image.id === idToRemove);
       if (removedImage) {
         URL.revokeObjectURL(removedImage.preview);
@@ -103,7 +103,7 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSubmit = new FormData();
 
@@ -111,13 +111,18 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
       formDataToSubmit.append(key, formData[key]);
     });
 
-    images.forEach((image, index) => {
-      formDataToSubmit.append(`images`, image.file);
+    images.forEach((image) => {
+      formDataToSubmit.append('images', image.file);
     });
 
     formDataToSubmit.append('stockUnitAndPrice', JSON.stringify(stockUnitAndPrice));
-    onSubmit(formDataToSubmit);
-    onClose();
+
+    const response = await createItem(formDataToSubmit);
+
+    console.log( response);
+    
+    // onSubmit(formDataToSubmit);
+    navigate('/items'); // Redirect after submission
   };
 
   useEffect(() => {
@@ -131,7 +136,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
     };
     fetchSuppliers();
 
-    // Cleanup function to revoke object URLs
     return () => {
       images.forEach(image => {
         URL.revokeObjectURL(image.preview);
@@ -139,16 +143,14 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
     };
   }, []);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg w-full max-w-3xl my-8">
+    <div className="container mx-auto p-4">
+      <div className="bg-white rounded-lg w-full max-w-3xl mx-auto my-8">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Add New Item</h2>
             <button 
-              onClick={onClose}
+              onClick={() => navigate('/items')}
               className="text-gray-500 hover:text-gray-700"
             >
               <X className="h-5 w-5" />
@@ -160,9 +162,7 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Item Images</h3>
               
-              {/* Drag & Drop Zone */}
               <div
-                ref={dropZoneRef}
                 onDragEnter={handleDragEnter}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -199,7 +199,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
               </div>
 
-              {/* Image Previews */}
               {images.length > 0 && (
                 <div className="grid grid-cols-4 gap-4 mt-4">
                   {images.map((image) => (
@@ -212,7 +211,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
                         alt="Preview"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200" />
                       <button
                         type="button"
                         onClick={() => removeImage(image.id)}
@@ -225,7 +223,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
               )}
             </div>
-
      {/* Basic Information Section */}
      <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
@@ -377,10 +374,11 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
                 ))}
    </div>
    </div>
+
             <div className="flex justify-end space-x-3 pt-6">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => navigate('/items')}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Cancel
@@ -399,4 +397,4 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
   );
 };
 
-export default ItemModal;
+export default CreateItem;

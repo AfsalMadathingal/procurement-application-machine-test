@@ -9,8 +9,10 @@
    brand: { type: String, required: true },
    category: { type: String, required: true },
    supplier: { type: String, required: true },
-   stockUnit: { type: String, required: true , enum: ["Kg", "Ltr", "Pcs", "Box"] },
-   unitPrice: { type: Number, required: true },
+   stockUnitAndPrice:[
+       {stockUnit: { type: String, required: true , enum: ["Kg", "Ltr", "Pcs", "Box"] },
+       unitPrice: { type: Number, required: true }},
+   ],
    itemImages: { type: [String], required: true },
    status:{ type: String, required: true, default: "Enabled", enum: ["Enabled", "Disabled"] }
  });

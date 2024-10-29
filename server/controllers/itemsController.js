@@ -20,22 +20,52 @@ exports.addItem = async (req, res, next) => {
     try {
 
 
+        
+
+        const images = req.files.map((file)=>{
+        return `${process.env.BASE_URL}/uploads/${file.filename}`
+        });
+        req.body.itemImages = images;
+        
+
         const itemNo = await Item.countDocuments();
         req.body.itemNo = `ITM${itemNo + 1}`
 
-        const item = new Item(req.body);
 
-        await item.save();
 
+
+        const itemData = { ...req.body };
+      
+        if (typeof itemData.stockUnitAndPrice === 'string') {
+          itemData.stockUnitAndPrice = JSON.parse(itemData.stockUnitAndPrice);
+        }
+    
+        itemData.stockUnitAndPrice = itemData.stockUnitAndPrice.map(unit => ({
+          ...unit,
+          unitPrice: Number(unit.unitPrice)
+        }));
+    
+        const newItem = new Item(itemData);
+        const savedItem = await newItem.save();
+        
+        if (!savedItem) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json(
+                new apiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Item not added')
+            );
+        }
 
         res.status(HTTP_STATUS.CREATED).json(
-            new apiResponse(HTTP_STATUS.CREATED, item, 'Success')
+            new apiResponse(HTTP_STATUS.CREATED, savedItem, 'Success')
         );
+
+
     } catch (error) {
+
         next(error);
 
     }
 };
+
 
 exports.getItemById = async (req, res, next) => {
 
@@ -98,6 +128,25 @@ exports.deleteItem = async (req, res, next) => {
 
         res.status(HTTP_STATUS.OK).json(
             new apiResponse(HTTP_STATUS.OK, null, 'Success')
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getItemsBySupplier = async (req, res, next) => {
+    try {
+        const { supplierNo } = req.params;    
+        console.log('====================================');
+        console.log(req.params);
+        console.log('====================================');
+        const items = await Item.find({supplier: supplierNo});
+
+         console.log('====================================');
+         console.log(items);
+         console.log('====================================');
+        res.status(HTTP_STATUS.OK).json(    
+            new apiResponse(HTTP_STATUS.OK, items, 'Success')
         );
     } catch (error) {
         next(error);

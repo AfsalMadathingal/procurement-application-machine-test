@@ -1,24 +1,40 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Suppliers from './pages/Suppliers';
-import Items from './pages/Items';
-import PurchaseOrders from './pages/PurchaseOrders';
-import Dashboard from './components/CardComponent';
+
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Suppliers from "./pages/Suppliers";
+import Items from "./pages/Items";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import Layout from "./components/Layout";
+import { Toaster } from "react-hot-toast";
+import ScrollToTop from "./components/ScrollToTop";
+import CreateOrder from "./pages/CreateOrder";
+import CreateItem from "./pages/CreatItem";
 
 
 const App = () => {
-    return (
-        <Router>
-            <div className="container flex grid grid-cols-[auto,1fr] min-h-screen">
-            <Dashboard />
-                <Routes>
-                    <Route path="/suppliers" element={<Suppliers />} />
-                    <Route path="/items" element={<Items />} />
-                    <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                </Routes>
+
+
+  return (
+    <>
+      <Toaster />
+      <Router>
+        <ScrollToTop />
+        <div className="flex h-screen overflow-hidden ">
+          <Layout>
+            <div className="flex p-4 ">
+              <Routes>
+                <Route path="/suppliers" element={<Suppliers />} />
+                <Route path="/items" element={<Items />} />
+                <Route path="/items/create" element={<CreateItem />} />
+                <Route path="/purchase-orders" element={<PurchaseOrders />} />
+                <Route path="/purchase-orders/add" element={<CreateOrder />} />
+
+              </Routes>
             </div>
-        </Router>
-    );
+          </Layout>
+        </div>
+      </Router> 
+    </>
+  );
 };
 
 export default App;

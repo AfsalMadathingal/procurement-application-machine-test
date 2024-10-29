@@ -94,3 +94,21 @@ exports.deletePurchaseOrder = async (req, res, next) => {
         next(error);
     }
 };
+
+
+ exports.getOrderNumber = async (req, res, next) => {
+    try {
+
+        console.log('====================================');
+        console.log(req.params);
+        
+        const purchaseOrderNo = await PurchaseOrder.countDocuments();
+        const orderNumber = `PO${purchaseOrderNo + 1}`;
+
+        res.status(HTTP_STATUS.OK).json(
+            new apiResponse(HTTP_STATUS.OK, orderNumber, 'Success')
+        );
+    } catch (error) {
+        next(error);
+    }
+}

@@ -1,8 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react';
 import { getSuppliers } from '../services/supplierService';
+import PropTypes from 'prop-types';
+
 
 const ItemModal = ({ isOpen, onClose, onSubmit }) => {
+
+ItemModal.propTypes = {
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func,
+  onSubmit: PropTypes.func,
+};
+
   const [suppliersList, setSuppliersList] = useState([]);
   const fileInputRef = useRef(null);
   const dropZoneRef = useRef(null);
@@ -51,7 +60,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
   const removeImage = (idToRemove) => {
     setImages(prev => {
       const filtered = prev.filter(image => image.id !== idToRemove);
-      // Revoke the URL to prevent memory leaks
       const removedImage = prev.find(image => image.id === idToRemove);
       if (removedImage) {
         URL.revokeObjectURL(removedImage.preview);
@@ -131,7 +139,6 @@ const ItemModal = ({ isOpen, onClose, onSubmit }) => {
     };
     fetchSuppliers();
 
-    // Cleanup function to revoke object URLs
     return () => {
       images.forEach(image => {
         URL.revokeObjectURL(image.preview);

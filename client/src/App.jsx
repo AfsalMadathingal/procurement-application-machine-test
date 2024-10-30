@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/ScrollToTop";
 import CreateOrder from "./pages/CreateOrder";
 import CreateItem from "./pages/CreatItem";
+import Home from "./pages/Home";
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
           <Layout>
             <div className="flex p-4 ">
               <Routes>
+                <Route path="/" element={<Home />} />
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/items" element={<Items />} />
                 <Route path="/items/create" element={<CreateItem />} />
